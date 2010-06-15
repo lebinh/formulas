@@ -6,7 +6,6 @@ let alpha = ['a'-'z' 'A'-'Z' '_']
 let digit = ['0'-'9']
 let id = alpha(alpha|digit)*
 let intnum = digit+
-let fnum = digit*('.')digit+
 let whitespace = [' ' '\t']
 
 rule tokenizer = parse
@@ -17,8 +16,6 @@ rule tokenizer = parse
   | "true" { TRUE }
   | "false" { FALSE }
   | "simpl" { SIMPL }
-  | "qez" { QEZ }
-  | "lin" { LIN }
   | "help" { HELP }
   | ',' { COMMA }
   | ')' { CPAREN }
@@ -35,7 +32,6 @@ rule tokenizer = parse
   | '-' { MINUS }
   | '*' { STAR }
   | intnum as numstr { INT_LIT (int_of_string numstr) }
-  | fnum as numstr { FLOAT_LIT (float_of_string numstr) }
   | id as idstr { ID idstr }
   | whitespace { tokenizer lexbuf }
   | '\n' { NEWLINE }

@@ -1,9 +1,8 @@
 type id = string
 
 type spec_var =
-  | FloatVar of id
   | IntVar of id
-  
+
 type formula =
   | BForm of b_formula
   | And of (formula * formula)
@@ -11,7 +10,7 @@ type formula =
   | Not of formula
   | Forall of (spec_var * formula)
   | Exists of (spec_var * formula)
-  
+
 and b_formula =
   | BConst of bool
   (* all comparisons are comparing to 0 *)
@@ -25,19 +24,13 @@ and b_formula =
 and exp =
   | Var of spec_var
   | IConst of int
-  | FConst of float
   | Add of (exp * exp)
   | Subtract of (exp * exp)
-  | Mult of (int * exp)
-  | Floor of exp
+  | Mult of (exp * exp)
 
 let mkSpecVar id =
-  let prefix = String.sub id 0 1 in
-  if prefix = "f" then
-    FloatVar id
-  else
-    IntVar id  
-    
+  IntVar id  
+
 let mkVar id = Var (mkSpecVar id)
 and mkAnd f1 f2 = And (f1, f2)
 and mkOr f1 f2 = Or (f1, f2)
@@ -56,13 +49,10 @@ and mkNeq e1 e2 = Neq (e1, e2)
 
 and mkAdd e1 e2 = Add (e1, e2)
 and mkSubtract e1 e2 = Subtract (e1, e2)
-and mkMult i e = Mult (i, e)
-and mkFloor e = Floor e
+and mkMult e1 e2 = Mult (e1, e2)
   
 let string_of_spec_var sv = match sv with
-  | FloatVar id -> id
   | IntVar id -> id
-  
 
 let rec string_of_formula f = match f with
   | BForm b -> string_of_b_formula b
@@ -86,7 +76,7 @@ and string_of_b_formula bf =
 
 and string_of_exp e0 = 
   let need_parentheses e = match e with
-    | Var _ | IConst _ | FConst _ | Floor _ | Mult _ -> false
+    | Var _ | IConst _ | Mult _ -> false
     | Add _ | Subtract _ -> true
   in let wrap e =
     if need_parentheses e then "(" ^ (string_of_exp e) ^ ")"
@@ -94,7 +84,6 @@ and string_of_exp e0 =
   in match e0 with
     | Var sv -> string_of_spec_var sv
     | IConst i -> string_of_int i
-    | FConst f -> string_of_float f
     | Add (e1, e2) ->
         let e1 = string_of_exp e1 in
         let e2 = string_of_exp e2 in
@@ -103,13 +92,11 @@ and string_of_exp e0 =
         let e1 = string_of_exp e1 in
         let e2 = string_of_exp e2 in
         e1 ^ " - " ^ e2
-    | Mult (i, e1) ->
+    | Mult (e1, e2) ->
         let e1 = wrap e1 in
-        (string_of_int i) ^ " * " ^ e1
-    | Floor e1 -> "[" ^ (string_of_exp e1) ^ "]"  
+        let e2 = wrap e2 in
+        e1 ^ " * " ^ e2
 
 let is_same_var (v1: spec_var) (v2: spec_var) = match v1, v2 with
-  | FloatVar id1, FloatVar id2 -> if id1 = id2 then true else false
   | IntVar id1, IntVar id2 -> if id1 = id2 then true else false
-  | _, _ -> false
 

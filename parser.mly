@@ -7,15 +7,14 @@
       flush stdout
     end
 
-  let help_string = " Usage:\n  simpl (exp|formula)\n  lin formula\n  qez formula"
+  let help_string = "Usage:\n  simpl (exp|formula)"
 %}
 
-%token <float> FLOAT_LIT
 %token <int> INT_LIT
 %token <string> ID
 %token TRUE FALSE
 %token FORALL EXISTS
-%token SIMPL QEZ LIN HELP
+%token SIMPL HELP
 %token OPAREN CPAREN OSQUARE CSQUARE
 %token COMMA
 %token NEWLINE
@@ -45,10 +44,8 @@ line:
     NEWLINE {}
   | formula NEWLINE { output (" [f] " ^ (Ast.string_of_formula $1)) }
   | exp NEWLINE { output (" [e] " ^ (Ast.string_of_exp $1)) }
-  | SIMPL exp NEWLINE { output (" [se] " ^ (Ast.string_of_exp (Qe.simplify_exp $2))) }
-  | SIMPL formula NEWLINE { output (" [sf] " ^ (Ast.string_of_formula (Qe.simplify $2))) }
-  | LIN formula NEWLINE { output (" [linz] " ^ (Ast.string_of_formula (Qe.lin_z $2 (Ast.IntVar "v0"))))}
-  | QEZ formula NEWLINE { output (" [qez] " ^ (Ast.string_of_formula (Qe.qe_z $2)))}
+  | SIMPL exp NEWLINE { output (" [se] " ^ (Ast.string_of_exp (Simplification.simplify_exp $2))) }
+  | SIMPL formula NEWLINE { output (" [sf] " ^ (Ast.string_of_formula (Simplification.simplify $2))) }
   | HELP NEWLINE { output help_string }
 ;
 
@@ -74,13 +71,10 @@ bformula:
 ;
 
 exp:
-    FLOAT_LIT { Ast.FConst $1 }
-  | INT_LIT { Ast.IConst $1 }
   | ID { Ast.mkVar $1 }
   | exp PLUS exp { Ast.mkAdd $1 $3 }
   | exp MINUS exp { Ast.mkSubtract $1 $3 }
-  | INT_LIT STAR exp { Ast.mkMult $1 $3 }
-  | OSQUARE exp CSQUARE { Ast.mkFloor $2 }
+  | exp STAR exp { Ast.mkMult $1 $3 }
   | OPAREN exp CPAREN { $2 }
 ;
 

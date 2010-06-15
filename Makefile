@@ -1,14 +1,14 @@
 all: main
 
-main: ast.cmo qe.cmo lexer.cmo parser.cmo main.cmo
-	ocamlc -o main ast.cmo qe.cmo lexer.cmo parser.cmo main.cmo
+main: ast.cmo simplification.cmo parser.cmo lexer.cmo main.cmo
+	ocamlc -o main ast.cmo simplification.cmo parser.cmo lexer.cmo main.cmo
 
 ast.cmo: ast.ml
 	ocamlc -c ast.ml
+
+simplification.cmo: simplification.ml
+	ocamlc -c simplification.ml
 	
-qe.cmo: qe.ml
-	ocamlc -c qe.ml
-  
 lexer.cmo lexer.ml: lexer.mll parser.ml
 	ocamllex lexer.mll
 	ocamlc -c lexer.ml
@@ -22,4 +22,4 @@ main.cmo: main.ml
 	ocamlc -c main.ml
 
 clean:
-	rm *.cm* lexer.ml parser.ml main
+	rm -f *.cm* lexer.ml parser.ml main
