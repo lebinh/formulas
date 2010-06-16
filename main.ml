@@ -4,6 +4,6 @@ let main () =
     print_string ">> ";
     flush stdout;
     Parser.input Lexer.tokenizer lexbuf
-  with End_of_file -> (print_endline "[eof]"; exit 0)
+  with End_of_file -> (print_endline ""; exit 0)
 
 let _ = Printexc.print main ()

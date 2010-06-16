@@ -4,7 +4,46 @@
 
 open Ast
 
-let rec simplify_exp (e0: exp) : exp = match e0 with
+let rec distribute_mult e0 = match e0 with
+  | Mult (e1, e2) -> begin
+      match e1, e2 with
+      | Add (e11, e12), e ->
+          let e11 = distribute_mult (Mult (e11, e)) in
+          let e12 = distribute_mult (Mult (e12, e)) in
+          Add (e11, e12)
+      | e, Add (e21, e22) ->
+          let e21 = distribute_mult (Mult (e, e21)) in
+          let e22 = distribute_mult (Mult (e, e22)) in
+          Add (e21, e22)
+      | _ -> e0
+    end
+  | _ -> e0
+
+let negate_bformula bf0 = match bf0 with
+  | BConst b -> Some (BConst (not b))
+  | Lt (e1, e2) -> Some (Gte (e1, e2))
+  | Lte (e1, e2) -> Some (Gt (e1, e2))
+  | Gt (e1, e2) -> Some (Lte (e1, e2))
+  | Gte (e1, e2) -> Some (Lt (e1, e2))
+  | Eq (e1, e2) -> Some (Neq (e1, e2))
+  | Neq (e1, e2) -> Some (Eq (e1, e2))
+
+let rec negate_formula f0 = match f0 with
+  | BForm bf ->
+      let neg_bf = negate_bformula bf in
+      let res = match neg_bf with
+        | Some new_bf -> BForm new_bf
+        | None -> Not (BForm bf)
+      in res
+  | And (f1, f2) -> Or (negate_formula f1, negate_formula f2)
+  | Or (f1, f2) -> And (negate_formula f1, negate_formula f2)
+  | Not f -> f
+  | Forall (sv, f) -> Exists (sv, negate_formula f)
+  | Exists (sv, f) -> Forall (sv, negate_formula f)
+
+let rec simplify_exp (e0: exp) : exp =
+  let e0 = distribute_mult e0 in 
+  match e0 with
   | Var _ | IConst _ -> e0
   | Add (e1, e2) ->
       let e1 = simplify_exp e1 in
@@ -88,11 +127,8 @@ let rec simplify f = match f with
         | _, _ -> Or (f1, f2)
       in res
   | Not f1 ->
-      let f1 = simplify f1 in
-      let res= match f1 with
-        | BForm (BConst b) -> BForm (BConst (not b))
-        | _ -> Not f1
-      in res
+      let f1 = negate_formula f1 in
+      simplify f1
   | Forall (sv, f1) ->
       let f1 = simplify f1 in
       Forall (sv, f1)

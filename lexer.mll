@@ -11,6 +11,7 @@ let whitespace = [' ' '\t']
 rule tokenizer = parse
     "or" { OR }
   | "and" { AND }
+  | "imply" { IMPLY }
   | "all" { FORALL }
   | "ex" { EXISTS }
   | "true" { TRUE }

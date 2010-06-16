@@ -18,10 +18,11 @@
 %token OPAREN CPAREN OSQUARE CSQUARE
 %token COMMA
 %token NEWLINE
-%token OR AND NOT
+%token OR AND NOT IMPLY
 %token GT GTE LT LTE EQ NEQ
 %token PLUS MINUS STAR
 
+%left IMPLY
 %left OR
 %left AND
 %right NOT
@@ -42,10 +43,10 @@ input:
 line:
   /* parsing command line input */
     NEWLINE {}
-  | formula NEWLINE { output (" [f] " ^ (Ast.string_of_formula $1)) }
-  | exp NEWLINE { output (" [e] " ^ (Ast.string_of_exp $1)) }
-  | SIMPL exp NEWLINE { output (" [se] " ^ (Ast.string_of_exp (Simplification.simplify_exp $2))) }
-  | SIMPL formula NEWLINE { output (" [sf] " ^ (Ast.string_of_formula (Simplification.simplify $2))) }
+  | formula NEWLINE { output (Ast.string_of_formula $1) }
+  | exp NEWLINE { output (Ast.string_of_exp $1) }
+  | SIMPL exp NEWLINE { output (Ast.string_of_exp (Simplification.simplify_exp $2)) }
+  | SIMPL formula NEWLINE { output (Ast.string_of_formula (Simplification.simplify $2)) }
   | HELP NEWLINE { output help_string }
 ;
 
@@ -53,6 +54,7 @@ formula:
   | bformula { Ast.BForm $1 }
   | formula OR formula { Ast.mkOr $1 $3 }
   | formula AND formula { Ast.mkAnd $1 $3 }
+  | formula IMPLY formula { Ast.mkOr (Ast.mkNot $1) $3 }
   | NOT formula { Ast.mkNot $2 }
   | FORALL OPAREN ID COMMA formula CPAREN { Ast.mkForall $3 $5 }
   | EXISTS OPAREN ID COMMA formula CPAREN { Ast.mkExists $3 $5 }
@@ -71,6 +73,7 @@ bformula:
 ;
 
 exp:
+  | INT_LIT { Ast.IConst $1 }
   | ID { Ast.mkVar $1 }
   | exp PLUS exp { Ast.mkAdd $1 $3 }
   | exp MINUS exp { Ast.mkSubtract $1 $3 }
