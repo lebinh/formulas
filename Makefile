@@ -1,19 +1,19 @@
 OCAMLC=ocamlc
 OCAMLOPT=ocamlopt
 OCAMLDEP=ocamldep
-INCLUDES=
+INCLUDES=str.cma
 OCAMLFLAGS=$(INCLUDES)
 OCAMLOPTFLAGS=$(INCLUDES)
 
 all: formulas
 opt: formulas.opt
 
-FORMULAS_OBJS=ast.cmo simplification.cmo parser.cmo lexer.cmo main.cmo
+FORMULAS_OBJS=util.cmo ast.cmo simplification.cmo parser.cmo lexer.cmo main.cmo
 
 formulas: $(FORMULAS_OBJS)
 	$(OCAMLC) -o formulas $(OCAMLFLAGS) $(FORMULAS_OBJS)
 
-FORMULAS_OPT_OBJS=ast.cmx simplification.cmx parser.cmx lexer.cmx main.cmx
+FORMULAS_OPT_OBJS=util.cmx ast.cmx simplification.cmx parser.cmx lexer.cmx main.cmx
 
 formulas.opt: $(FORMULAS_OPT_OBJS)
 	$(OCAMLOPT) -o formulas.opt $(OCAMLFLAGS) $(FORMULAS_OPT_OBJS)

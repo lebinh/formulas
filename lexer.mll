@@ -18,6 +18,7 @@ rule tokenizer = parse
   | "false" { FALSE }
   | "simpl" { SIMPL }
   | "help" { HELP }
+  | "nomr" { NOMR }
   | ',' { COMMA }
   | ')' { CPAREN }
   | '(' { OPAREN }

@@ -50,9 +50,11 @@ and mkNeq e1 e2 = Neq (e1, e2)
 and mkAdd e1 e2 = Add (e1, e2)
 and mkSubtract e1 e2 = Subtract (e1, e2)
 and mkMult e1 e2 = Mult (e1, e2)
-  
-let string_of_spec_var sv = match sv with
+
+let var_name sv = match sv with
   | IntVar id -> id
+    
+let string_of_spec_var sv = var_name sv
 
 let rec string_of_formula f = match f with
   | BForm b -> string_of_b_formula b
@@ -95,8 +97,8 @@ and string_of_exp e0 =
     | Mult (e1, e2) ->
         let e1 = wrap e1 in
         let e2 = wrap e2 in
-        e1 ^ " * " ^ e2
+        e1 ^ "*" ^ e2
 
 let is_same_var (v1: spec_var) (v2: spec_var) = match v1, v2 with
   | IntVar id1, IntVar id2 -> if id1 = id2 then true else false
-
+  

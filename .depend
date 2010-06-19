@@ -1,10 +1,8 @@
 ast.cmo: 
 ast.cmx: 
-lexer.cmo: parser.cmo 
-lexer.cmx: parser.cmx 
-main.cmo: parser.cmo lexer.cmo 
-main.cmx: parser.cmx lexer.cmx 
-parser.cmo: simplification.cmo ast.cmo 
-parser.cmx: simplification.cmx ast.cmx 
-simplification.cmo: ast.cmo 
-simplification.cmx: ast.cmx 
+main.cmo: 
+main.cmx: 
+simplification.cmo: util.cmo ast.cmo 
+simplification.cmx: util.cmx ast.cmx 
+util.cmo: 
+util.cmx: 

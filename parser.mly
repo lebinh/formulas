@@ -14,7 +14,7 @@
 %token <string> ID
 %token TRUE FALSE
 %token FORALL EXISTS
-%token SIMPL HELP
+%token SIMPL HELP NOMR
 %token OPAREN CPAREN OSQUARE CSQUARE
 %token COMMA
 %token NEWLINE
@@ -47,6 +47,7 @@ line:
   | exp NEWLINE { output (Ast.string_of_exp $1) }
   | SIMPL exp NEWLINE { output (Ast.string_of_exp (Simplification.simplify_exp $2)) }
   | SIMPL formula NEWLINE { output (Ast.string_of_formula (Simplification.simplify $2)) }
+  | NOMR exp NEWLINE { output (Ast.string_of_exp (Simplification.nomarlize_exp $2)) }
   | HELP NEWLINE { output help_string }
 ;
 
